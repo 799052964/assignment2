@@ -3,6 +3,25 @@
 <div class="container text-center">
     <h1>Here are the wonderful room!</h1>
 
+    <a href="/rooms/add">Add a Room</a>
+    <table class="table table-striped">
+        <tr>
+            <th>Location</th>
+            <th>Bedroom</th>
+            <th>price</th>
+            <th>Edit</th>
+            <th>Delete</th>
+        </tr>
+        <% for (var i = 0; i < rooms.length; i++) { %>
+        <tr>
+            <td><%= rooms[i].location %></td>
+            <td><%= rooms[i].bedroom %></td>
+            <td><%= rooms[i].price %></td>
+            <td><a href="/teams/<%= rooms[i]._id %>">Edit</a></td>
+            <td><a href="/teams/delete/<%= rooms[i]._id %>" class="confirmation">Delete</a></td>
+        </tr>
+        <% } %>
+    </table>
 </div>
 
 <%- include partials/footer.ejs %>
