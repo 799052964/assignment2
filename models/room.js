@@ -8,14 +8,17 @@ var roomSchema = new mongoose.Schema({
     },
     bedroom: {
         type: Number,
-        min: 0
+        min: 0,
+        required: 'Bedroom cannot be blank'
     },
     price: {
         type: Number,
-        min: 0
+        min: 0,
+        required: 'Price cannot be blank'
     },
     introduction: {
-        type: String
+        type: String,
+        required: 'Introduction cannot be blank'
     }
 });
 
