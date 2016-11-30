@@ -3,8 +3,8 @@ var router = express.Router();
 
 var Room = require('../models/room');
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
+// get the room page
+router.get('/',  function(req, res, next) {
     Room.find(function(err, rooms) {
         if (err) {
             console.log(err);
@@ -21,14 +21,17 @@ router.get('/', function(req, res, next) {
     });
 });
 
-router.get('/add', function(req, res, next) {
+// get add a room page
+router.get('/add',isLoggedIn, function(req, res, next) {
     // load the blank form
     res.render('add-room', {
-        title: 'Add a New Room'
+        title: 'Add a New Room',
+        user: req.user
     });
 });
 
-router.post('/add', function(req, res, next) {
+// save the room into database
+router.post('/add',isLoggedIn, function(req, res, next) {
     // use the mongoose model to add the new record
 
     Room.create( {
@@ -48,7 +51,8 @@ router.post('/add', function(req, res, next) {
     });
 });
 
-router.get('/:id', function(req, res, next) {
+// get the edit room page
+router.get('/:id',isLoggedIn, function(req, res, next) {
 
     // look up the selected room
     var id = req.params.id;
@@ -69,7 +73,8 @@ router.get('/:id', function(req, res, next) {
     });
 });
 
-router.post('/:id', function(req, res, next) {
+// update the room
+router.post('/:id',isLoggedIn, function(req, res, next) {
     // get the id from the url
     var id = req.params.id;
 
@@ -93,5 +98,15 @@ router.post('/:id', function(req, res, next) {
         }
     });
 });
+
+// check if user is logged in
+function isLoggedIn(req, res, next) {
+    if (req.isAuthenticated()) {
+        return next();
+    }
+    else {
+        res.redirect('/login');
+    }
+}
 
 module.exports = router;

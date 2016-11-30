@@ -3,22 +3,28 @@
 <div class="container text-center">
     <h1>Here are the wonderful room!</h1>
 
+    <% if (user) { %>
     <a href="/rooms/add">Add a Room</a>
-    <table class="table table-striped">
+    <% }%>
+    <table class="table table-bordered">
         <tr>
             <th class="text-center">Location</th>
             <th class="text-center">Bedroom</th>
             <th class="text-center">price</th>
+            <% if (user) { %>
             <th class="text-center">Edit</th>
             <th class="text-center">Delete</th>
+            <% }%>
         </tr>
         <% for (var i = 0; i < rooms.length; i++) { %>
         <tr>
             <td><%= rooms[i].location %></td>
             <td><%= rooms[i].bedroom %></td>
             <td><%= rooms[i].price %></td>
+            <% if (user) { %>
             <td><a href="/rooms/<%= rooms[i]._id %>">Edit</a></td>
             <td><a href="/rooms/delete/<%= rooms[i]._id %>" class="confirmation">Delete</a></td>
+            <% }%>
         </tr>
         <% } %>
     </table>

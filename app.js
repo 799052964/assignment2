@@ -8,6 +8,7 @@ var bodyParser = require('body-parser');
 var routes = require('./routes/index');
 var users = require('./routes/users');
 var rooms = require('./routes/rooms');
+
 var app = express();
 
 // connect to mongodb with mongoose
@@ -16,6 +17,73 @@ var mongoose = require('mongoose');
 // link to global vars file
 var config = require('./config/globalVars');
 mongoose.connect(config.db);
+
+
+
+// passport config - add dependencies
+var session = require('express-session');
+var passport = require('passport');
+var localStrategy = require('passport-local').Strategy;
+var flash = require('connect-flash');
+app.use(flash());
+
+// enable sessions
+app.use(session({
+  secret: config.secret,
+  resave: true,
+  saveUninitialized: false
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+// link to the Account model which we build
+var Account = require('./models/account');
+passport.use(Account.createStrategy());
+
+// add facebook auth
+var facebookStrategy = require('passport-facebook').Strategy;
+
+// configure facebook auth
+passport.use(new facebookStrategy({
+      clientID: config.ids.facebook.clientID,
+      clientSecret: config.ids.facebook.clientSecret,
+      callbackURL: config.ids.facebook.callbackURL
+    }, function(accessToken, refreshToken, profile, cb) {
+
+      Account.findOne({ oauthID: profile.id }, function(err, user) {
+        if (err) {
+          console.log(err);
+        }
+        else {
+          if (!err && user != null) { // fb user already exists in our db
+            cb(null,  user);
+          }
+          else {
+            // create a new user from the fb profile
+            user = new Account({
+              oauthID: profile.id,
+              username: profile.displayName,
+              created: Date.now()
+            });
+
+            user.save(function(err, user) {
+              if (err) {
+                console.log(err);
+              }
+              else {
+                cb(null, user);
+              }
+            });
+          }
+        }
+      });
+    }
+));
+
+// read and write the user to / from the session
+passport.serializeUser(Account.serializeUser());
+passport.deserializeUser(Account.deserializeUser());
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
